@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="PetSense: pişiklər üçün ağıllı yaxalıq modulu. Basic versiya aktivliyi, GPS versiya isə həm aktivliyi, həm yeri izləyir.">
+<meta name="theme-color" content="#013C5C">
+<meta property="og:title" content="PetSense — pişiklər üçün aktivlik və GPS izləmə">
+<meta property="og:description" content="İki versiya, bir tətbiq: PetSense Basic 149 AZN, PetSense GPS 249 AZN.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23013C5C'/%3E%3Ctext x='32' y='47' font-size='40' text-anchor='middle' font-family='Arial' font-weight='700' fill='white'%3EP%3C/text%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('ps-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<title>PetSense — pişiklər üçün aktivlik və GPS izləmə</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF3F0; --surface:#FFFFFF; --ink:#12302E; --muted:#4D6663; --line:#CFDCD7;
+  --accent:#E8A317; --accent-ink:#12302E; --band:#F6DFA8; --bar:#1E5A55;
+  --head:"Bricolage Grotesque","Segoe UI",Arial,sans-serif;
+  --body:"Figtree","Segoe UI",Arial,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#0D1F1E;--surface:#14302D;--ink:#E7F1EE;--muted:#9FB8B3;--line:#27463F;--band:#4A3A12;--bar:#5FB3A8;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#0D1F1E;--surface:#14302D;--ink:#E7F1EE;--muted:#9FB8B3;--line:#27463F;--band:#4A3A12;--bar:#5FB3A8;color-scheme:dark}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.65 var(--body)}
+h1,h2,h3{font-family:var(--head);line-height:1.1;margin:0;letter-spacing:-.02em}
+h1{font-size:clamp(2.3rem,6vw,4.1rem);font-weight:700}
+h2{font-size:clamp(1.7rem,3.6vw,2.4rem);font-weight:700;margin-bottom:1rem}
+h3{font-size:1.2rem;font-weight:500;margin-bottom:.35rem}
+p{margin:0 0 1rem;max-width:62ch}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 1.25rem}
+section{padding:4.5rem 0}
+.muted{color:var(--muted)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 80%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);transition:box-shadow .3s}
+header.top.sc{box-shadow:0 8px 24px -18px rgba(0,0,0,.5)}
+.wrap.hb{display:flex;justify-content:space-between;align-items:center;padding-top:.8rem;padding-bottom:.8rem}
+.logo{font:700 1.25rem var(--head);text-decoration:none;display:flex;align-items:center;gap:.5rem}
+.mark{width:36px;height:36px;border-radius:10px;display:block}
+nav a{margin-left:1.25rem;text-decoration:none;font-weight:500;font-size:.95rem}
+nav a:hover{text-decoration:underline}
+@media(max-width:720px){nav a:not(.btn){display:none}}
+.btn{display:inline-block;background:var(--accent);color:var(--accent-ink);font-weight:600;padding:.8rem 1.4rem;border-radius:999px;text-decoration:none;border:0;cursor:pointer;font-size:1rem;font-family:var(--body)}
+.btn:hover{filter:brightness(1.07)}
+.btn.ghost{background:transparent;border:2px solid var(--ink);color:var(--ink)}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:3rem;align-items:center;padding:3rem 0 4rem}
+@media(max-width:860px){.hero{grid-template-columns:1fr}}
+.hero p.lead{font-size:1.2rem;margin:1.25rem 0 1.75rem}
+.cta{display:flex;gap:.8rem;flex-wrap:wrap}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:1.4rem}
+.panel h3{font-size:1rem;font-weight:500}
+.panel small{color:var(--muted)}
+svg.chart{width:100%;height:auto;display:block;margin-top:.6rem}
+svg text{font:500 12px var(--body);fill:var(--muted)}
+.bar{fill:var(--bar);transform-box:fill-box;transform-origin:bottom;animation:grow .9s cubic-bezier(.2,.8,.2,1) both}
+.bar.low{fill:var(--accent)}
+.bar:nth-of-type(2){animation-delay:.05s}.bar:nth-of-type(3){animation-delay:.1s}.bar:nth-of-type(4){animation-delay:.15s}
+.bar:nth-of-type(5){animation-delay:.2s}.bar:nth-of-type(6){animation-delay:.25s}.bar:nth-of-type(7){animation-delay:.3s}
+@keyframes grow{from{transform:scaleY(0)}}
+@media(prefers-reduced-motion:reduce){.bar{animation:none}html{scroll-behavior:auto}}
+.note{display:flex;gap:.6rem;align-items:flex-start;margin-top:.8rem;font-size:.95rem;border-top:1px solid var(--line);padding-top:.8rem}
+.note b{color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
+@media(max-width:800px){.two{grid-template-columns:1fr}}
+.alt{background:var(--surface);border-block:1px solid var(--line)}
+ol.flow{list-style:none;counter-reset:s;padding:0;margin:1.5rem 0 0;display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+@media(max-width:860px){ol.flow{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){ol.flow{grid-template-columns:1fr}}
+ol.flow li{counter-increment:s;border-top:3px solid var(--accent);padding-top:.8rem}
+ol.flow li::before{content:counter(s);font:700 1.6rem var(--head);display:block}
+ol.flow p{font-size:.97rem;margin:0}
+dl.screens{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem 2.5rem;margin:1.5rem 0 0}
+dl.screens dt{font:500 1.1rem var(--head);border-left:4px solid var(--accent);padding-left:.7rem}
+dl.screens dd{margin:.3rem 0 0 calc(4px + .7rem);color:var(--muted);font-size:.97rem}
+ul.plain{padding-left:1.1rem;margin:0}
+ul.plain li{margin-bottom:.6rem;max-width:58ch}
+.honest{border:2px dashed var(--line);border-radius:18px;padding:1.5rem}
+.price{font:700 clamp(2.6rem,6vw,3.8rem) var(--head);letter-spacing:-.03em}
+.price span{font-size:1.1rem;font-weight:500;color:var(--muted);letter-spacing:0}
+.tl{list-style:none;margin:1.5rem 0 0;padding:0 0 0 1.4rem;border-left:3px solid var(--line)}
+.tl li{position:relative;margin-bottom:1.5rem}
+.tl li::before{content:"";position:absolute;left:calc(-1.4rem - 8.5px);top:.5rem;width:14px;height:14px;border-radius:50%;background:var(--bg);border:3px solid var(--accent)}
+.tl li.now::before{background:var(--accent)}
+.tl b{font-family:var(--head);font-weight:500;font-size:1.1rem}
+details{border-bottom:1px solid var(--line);padding:1rem 0}
+summary{cursor:pointer;font:500 1.1rem var(--head);list-style:none;display:flex;justify-content:space-between;gap:1rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:1.4rem;line-height:1}
+details[open] summary::after{content:"–"}
+details p{margin:.7rem 0 0;color:var(--muted)}
+form{display:grid;gap:.9rem;max-width:460px}
+label{font-weight:500;font-size:.95rem;display:grid;gap:.3rem}
+input,select{font:inherit;padding:.75rem .9rem;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.ok{display:none;font-weight:600}
+footer{padding:2.5rem 0 3rem;color:var(--muted);font-size:.92rem;border-top:1px solid var(--line)}
+footer p{max-width:80ch}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem}
+@media(max-width:800px){.cards{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:1.6rem;display:flex;flex-direction:column}
+.card.gps{border:2px solid var(--accent)}
+.card .tag{font:600 .8rem var(--body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.card h3{font-size:1.7rem;font-weight:700;margin:.2rem 0 .6rem}
+.card .price{font-size:2.6rem}
+.card ul{flex:1;margin:1rem 0 1.4rem}
+.tw{overflow-x:auto;margin-top:1.5rem;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:.98rem}
+th,td{padding:.8rem 1rem;text-align:left;border-bottom:1px solid var(--line)}
+th{font:500 1rem var(--head)}
+tr:last-child td{border-bottom:0}
+td.y{font-weight:600}
+
+/* dinamik effektlər */
+:root{--e:cubic-bezier(.2,.8,.2,1)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg);pointer-events:none}
+body::after{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;background:radial-gradient(40% 35% at 20% 25%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 70%),radial-gradient(35% 40% at 80% 70%,color-mix(in srgb,var(--bar) 20%,transparent),transparent 70%);animation:drift 22s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translate3d(5%,4%,0) scale(1.1)}}
+.pg{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;height:3px;z-index:40;background:var(--accent);transform:scaleX(0);transform-origin:left;pointer-events:none}
+@keyframes rise{from{opacity:0;translate:0 26px}to{opacity:1;translate:0 0}}
+.js .rv{opacity:0}
+.js .rv.in{animation:rise .8s var(--e) var(--d,0s) both}
+.js h1 .w{display:inline-block;opacity:0;animation:rise .8s var(--e) both}
+.hero .panel{animation:float 7s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px)}}
+.bar{cursor:pointer;transition:filter .2s}
+.bar:hover{filter:brightness(1.25)}
+.ping{transform-box:fill-box;transform-origin:center}
+.ping.r{animation:ring 1.8s ease-out infinite}
+@keyframes ring{from{transform:scale(1);opacity:.9}to{transform:scale(3.4);opacity:0}}
+nav a.act:not(.btn){text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:3px;text-underline-offset:7px}
+.btn{transition:transform .2s,box-shadow .2s,filter .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px -10px rgba(232,163,23,.8)}
+.btn:active{transform:translateY(0)}
+.cta .btn:not(.ghost){animation:glow 2.6s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 10px rgba(232,163,23,0)}0%,100%{box-shadow:0 0 0 0 rgba(232,163,23,.45)}}
+.card{transition:transform .25s ease,box-shadow .3s;will-change:transform}
+.card:hover{box-shadow:0 22px 44px -22px rgba(0,0,0,.45)}
+.card.gps{animation:edge 3s ease-in-out infinite}
+@keyframes edge{50%{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}}
+.price b{font-weight:inherit}
+dl.screens>div{transition:transform .25s}
+dl.screens>div:hover{transform:translateX(6px)}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+details[open] p{animation:rise .4s var(--e)}
+summary{transition:color .2s}
+summary:hover{color:var(--accent)}
+@media(prefers-reduced-motion:reduce){body::after,.hero .panel,.ping.r,.cta .btn,.card.gps{animation:none}.js .rv,.js h1 .w{opacity:1;animation:none}.js .rv.in{animation:none}}
+
+/* cilalama */
+::selection{background:var(--accent);color:#12302E}
+h1,h2,h3{text-wrap:balance}
+p,li{text-wrap:pretty}
+nav{display:flex;align-items:center}
+.tt{margin-left:1rem;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1.15rem;line-height:1;cursor:pointer;transition:transform .35s var(--e),background .2s}
+.tt:hover{transform:rotate(180deg);background:var(--band)}
+nav .btn{margin-left:.8rem}
+.skip{position:absolute;left:1rem;top:-4rem;z-index:50;background:var(--accent);color:#12302E;padding:.6rem 1rem;border-radius:10px;font-weight:600;text-decoration:none;transition:top .2s}
+.skip:focus{top:calc(env(safe-area-inset-top,0px) + .6rem)}
+th:first-child,td:first-child{position:sticky;left:0;background:var(--surface)}
+form.flash{animation:flash 1.3s ease}
+@keyframes flash{30%{box-shadow:0 0 0 8px color-mix(in srgb,var(--accent) 35%,transparent);border-radius:18px}}
+.toplink{text-decoration:none;font-weight:600}
+.toplink:hover{text-decoration:underline}
+.ok.show{animation:rise .5s var(--e)}
+@media print{.pg,header.top,body::after,body::before,.skip{display:none}.js .rv,.js h1 .w{opacity:1;animation:none}}
+
+.lg{margin-left:1.1rem;height:40px;display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:3px;cursor:pointer;font:600 .8rem var(--body);color:var(--muted)}
+.lg span{padding:.4rem .65rem;border-radius:999px;transition:background .25s,color .25s}
+.lg span.on{background:var(--accent);color:#12302E}
+.tt{margin-left:.6rem}
+@media(max-width:520px){nav .btn{display:none}.lg{margin-left:.6rem}}
+
+/* tanıtım animasiyası */
+.vwrap{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:1rem;margin-top:1.5rem}
+.vstage{width:100%;height:auto;display:block;border-radius:16px;background:linear-gradient(180deg,color-mix(in srgb,var(--band) 40%,var(--surface)),var(--surface))}
+.vbar{height:4px;background:var(--line);border-radius:4px;overflow:hidden;margin:.9rem 0}
+.vbar i{display:block;height:100%;background:var(--accent);transform-origin:left;animation:vprog 12s linear infinite}
+@keyframes vprog{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.vctl{display:flex;gap:.9rem;align-items:flex-start}
+.vp{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:var(--accent);color:#12302E;font-size:1rem;cursor:pointer;transition:transform .2s}
+.vp:hover{transform:scale(1.08)}
+.caps{display:grid;flex:1;align-items:center;min-height:40px}
+.caps span{grid-area:1/1;opacity:0;font-weight:500}
+.vnote{margin:.7rem 0 0;font-size:.88rem;color:var(--muted)}
+.c1,.sA{opacity:1}.c2,.c3,.sB,.sC{opacity:0}
+.c1,.sA{animation:sa 12s infinite}.c2,.sB{animation:sb 12s infinite}.c3,.sC{animation:sc 12s infinite}
+@keyframes sa{0%,28%,100%{opacity:1}34%,94%{opacity:0}}
+@keyframes sb{0%,30%{opacity:0}36%,62%{opacity:1}68%,100%{opacity:0}}
+@keyframes sc{0%,64%{opacity:0}70%,94%{opacity:1}100%{opacity:0}}
+.tail{transform-origin:138px 258px;animation:wag 2.2s ease-in-out infinite alternate}
+@keyframes wag{from{transform:rotate(-7deg)}to{transform:rotate(9deg)}}
+.head{transform-origin:300px 240px;animation:nod 4s ease-in-out infinite}
+@keyframes nod{50%{transform:rotate(2deg)}}
+.led{animation:blink 1.4s steps(2) infinite}
+@keyframes blink{50%{opacity:.15}}
+.sg2{animation-delay:.9s!important}
+.flow{animation:vflow 1.2s linear infinite}
+@keyframes vflow{to{stroke-dashoffset:-24}}
+.vb{transform-box:fill-box;transform-origin:bottom;animation:vg 12s infinite}
+.vb.d1{animation-delay:.08s}.vb.d2{animation-delay:.16s}.vb.d3{animation-delay:.24s}.vb.d4{animation-delay:.32s}
+@keyframes vg{0%{transform:scaleY(.1)}8%,100%{transform:scaleY(1)}}
+.drop{animation:vdrop 12s infinite}
+@keyframes vdrop{0%,66%{transform:translateY(-24px)}73%,100%{transform:translateY(0)}}
+.paused *{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.vwrap *{animation:none!important}.c2,.c3,.sB,.sC{display:none}}
+</style>
+</head>
+<body>
+<div class="pg" id="pg"></div>
+<a class="skip" href="#mehsullar">Əsas məzmuna keç</a>
+<header class="top"><div class="wrap hb">
+    <a class="logo" href="#"><img class="mark" src="data:image/png;base64,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" alt="" width="36" height="36">PetSense</a>
+    <nav>
+      <a href="#mehsullar">Məhsullar</a>
+      <a href="#texnologiya">Texnologiya</a>
+      <a href="#qiymet">Qiymət</a>
+      <a href="#sual">Suallar</a>
+      <button class="lg" id="lg" type="button" aria-label="Dil / Language" title="AZ / EN"><span class="on">AZ</span><span>EN</span></button>
+      <button class="tt" id="tt" type="button" aria-label="Açıq və tünd rejimi dəyiş" title="Açıq / tünd rejim">◐</button>
+      <a class="btn" href="#sifaris">Sifariş et</a>
+    </nav>
+  </div></header>
+<div class="wrap">
+
+  <div class="hero">
+    <div>
+      <h1>Pişiyinizin gününü və yerini bilin.</h1>
+      <p class="lead">PetSense pişik üçün ağıllı yaxalıq moduludur. Gündəlik aktivliyi və istirahəti izləyir. İstəsəniz, GPS ilə pişiyin harada olduğunu da göstərir.</p>
+      <div class="cta">
+        <a class="btn" href="#mehsullar">İki versiyaya bax</a>
+        <a class="btn ghost" href="#sifaris">Sifariş et</a>
+      </div>
+    </div>
+    <div class="panel" aria-label="Nümunə aktivlik qrafiki">
+      <h3>Pişiyin son 7 günü</h3>
+      <small>Nümunə göstərici, real məlumat deyil</small>
+      <svg class="chart" viewBox="0 0 420 230" role="img" aria-label="Yeddi günlük aktivlik qrafiki: altı gün normal, sonuncu gün aşağı">
+        <rect x="10" y="70" width="400" height="40" rx="8" fill="var(--band)"/>
+        <text x="16" y="64">Bu pişiyin normal aralığı</text>
+        <g>
+          <rect class="bar" x="30" y="76" width="34" height="124" rx="6"><title>Bazar ertəsi: norma daxilində</title></rect>
+          <rect class="bar" x="85" y="68" width="34" height="132" rx="6"><title>Çərşənbə axşamı: norma daxilində</title></rect>
+          <rect class="bar" x="140" y="82" width="34" height="118" rx="6"><title>Çərşənbə: norma daxilində</title></rect>
+          <rect class="bar" x="195" y="72" width="34" height="128" rx="6"><title>Cümə axşamı: norma daxilində</title></rect>
+          <rect class="bar" x="250" y="78" width="34" height="122" rx="6"><title>Cümə: norma daxilində</title></rect>
+          <rect class="bar" x="305" y="66" width="34" height="134" rx="6"><title>Şənbə: norma daxilində</title></rect>
+          <rect class="bar low" x="360" y="140" width="34" height="60" rx="6"><title>Bazar: normadan aşağı</title></rect>
+        </g>
+        <circle class="ping" cx="377" cy="130" r="6" fill="var(--accent)"/><circle class="ping r" cx="377" cy="130" r="6" fill="none" stroke="var(--accent)" stroke-width="2"/>
+        <g text-anchor="middle">
+          <text x="47" y="220">B.e</text><text x="102" y="220">Ç.a</text><text x="157" y="220">Çər</text><text x="212" y="220">C.a</text><text x="267" y="220">Cüm</text><text x="322" y="220">Şən</text><text x="377" y="220">Baz</text>
+        </g>
+      </svg>
+      <div class="note"><span aria-hidden="true">🐾</span><span><b>Bu gün adi hərəkətdən az.</b> Yuxu və aktivlik dəyişikliyini tətbiqdə görürsünüz.</span></div>
+    </div>
+  </div>
+</div>
+
+<section id="video">
+  <div class="wrap">
+    <h2>Pişiyin üzərində PetSense</h2>
+    <p>Yaxalıqdakı kiçik modul pişiyin hərəkətini ölçür, məlumatı telefona göndərir və dəyişiklik olanda sizi xəbərdar edir.</p>
+    <div class="vwrap" id="vw">
+      <svg class="vstage" viewBox="0 0 640 340" role="img" aria-label="Pişiyin boynundakı PetSense modulunun işləməsini göstərən konsept animasiya">
+        <ellipse cx="228" cy="314" rx="125" ry="10" fill="var(--line)"/>
+        <g class="tail"><path d="M138 258C86 256 70 196 112 172" fill="none" stroke="var(--ink)" stroke-width="16" stroke-linecap="round"/></g>
+        <rect x="168" y="272" width="22" height="40" rx="10" fill="var(--ink)"/>
+        <rect x="262" y="272" width="22" height="40" rx="10" fill="var(--ink)"/>
+        <ellipse cx="225" cy="250" rx="96" ry="52" fill="var(--ink)"/>
+        <g class="head">
+          <polygon points="287,160 296,118 322,150" fill="var(--ink)"/>
+          <polygon points="320,148 348,120 356,164" fill="var(--ink)"/>
+          <circle cx="318" cy="190" r="44" fill="var(--ink)"/>
+          <circle cx="333" cy="182" r="5" fill="var(--accent)"/><circle cx="351" cy="184" r="5" fill="var(--accent)"/>
+          <ellipse cx="333" cy="182" rx="1.6" ry="4" fill="#12302E"/><ellipse cx="351" cy="184" rx="1.6" ry="4" fill="#12302E"/>
+          <path d="M284 218Q306 240 336 222" fill="none" stroke="var(--accent)" stroke-width="10" stroke-linecap="round"/>
+          <rect x="296" y="222" width="24" height="16" rx="4" fill="#013C5C" stroke="#fff" stroke-width="2"/>
+          <circle class="led" cx="314" cy="230" r="2.4" fill="#fff"/>
+        </g>
+        <circle class="ping r" cx="308" cy="230" r="6" fill="none" stroke="var(--accent)" stroke-width="2"/>
+        <circle class="ping r sg2" cx="308" cy="230" r="6" fill="none" stroke="var(--accent)" stroke-width="2"/>
+        <path class="flow" d="M322 232C392 232 410 190 455 186" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 10"/>
+        <rect x="455" y="58" width="140" height="256" rx="22" fill="var(--surface)" stroke="var(--ink)" stroke-width="3"/>
+        <rect x="508" y="66" width="34" height="6" rx="3" fill="var(--line)"/>
+        <g class="sA">
+          <rect x="467" y="150" width="116" height="40" rx="8" fill="var(--band)"/>
+          <rect class="vb" x="474" y="140" width="14" height="110" rx="4" fill="var(--bar)"/>
+          <rect class="vb d1" x="495" y="134" width="14" height="116" rx="4" fill="var(--bar)"/>
+          <rect class="vb d2" x="516" y="146" width="14" height="104" rx="4" fill="var(--bar)"/>
+          <rect class="vb d3" x="537" y="138" width="14" height="112" rx="4" fill="var(--bar)"/>
+          <rect class="vb d4" x="558" y="212" width="14" height="38" rx="4" fill="var(--accent)"/>
+        </g>
+        <g class="sB">
+          <rect x="467" y="92" width="116" height="190" rx="12" fill="var(--band)" opacity=".55"/>
+          <path d="M467 190H583M510 92V282M556 92V282" stroke="var(--line)" stroke-width="6" fill="none"/>
+          <circle cx="525" cy="170" r="42" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 5"/>
+          <circle class="ping r" cx="525" cy="170" r="8" fill="none" stroke="var(--accent)" stroke-width="2"/>
+          <circle cx="525" cy="170" r="8" fill="var(--accent)"/><circle cx="525" cy="170" r="3" fill="#fff"/>
+        </g>
+        <g class="sC"><g class="drop">
+          <rect x="472" y="104" width="106" height="52" rx="12" fill="#013C5C"/>
+          <circle cx="492" cy="130" r="9" fill="var(--accent)"/>
+          <rect x="508" y="121" width="58" height="6" rx="3" fill="#fff"/><rect x="508" y="134" width="40" height="6" rx="3" fill="#fff" opacity=".6"/>
+        </g></g>
+      </svg>
+      <div class="vbar"><i></i></div>
+      <div class="vctl">
+        <button class="vp" id="vp" type="button" aria-label="Animasiyanı dayandır / davam etdir" aria-pressed="false">⏸</button>
+        <div class="caps">
+          <span class="c1">1. Modul pişiyin hərəkətini ölçür</span>
+          <span class="c2">2. Məlumat telefona çatır, GPS versiyada yer xəritədə görünür</span>
+          <span class="c3">3. Dəyişiklik olsa, bildiriş gəlir</span>
+        </div>
+      </div>
+      <p class="vnote">Konsept animasiya, real məhsulun çəkilişi deyil.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="problem">
+  <div class="wrap">
+    <h2>Pişik sahiblərinin qarşılaşdığı problemlər</h2>
+    <dl class="screens">
+      <div><dt>Məlumat çatışmazlığı</dt><dd>Pişiyin gün ərzində nə qədər aktiv olduğunu bilmirsiniz.</dd></div>
+      <div><dt>Yer problemi</dt><dd>Pişik çölə çıxanda harada olduğunu bilmək çətindir.</dd></div>
+      <div><dt>Davranış dəyişiklikləri</dt><dd>Yuxu və aktivlik vərdişlərindəki dəyişiklik gözdən qaça bilər.</dd></div>
+      <div><dt>Təhlükəsizlik narahatlığı</dt><dd>Pişiyin təhlükəsizliyi barədə arxayın olmaq istəyirsiniz.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="mehsullar">
+  <div class="wrap">
+    <h2>İki versiya, bir tətbiq</h2>
+    <p>Ehtiyacınıza uyğun olanı seçin.</p>
+    <div class="cards">
+      <article class="card">
+        <span class="tag">Abunəsiz</span>
+        <h3>PetSense Basic</h3>
+        <div class="price"><b data-n="149" data-d="0">149</b> <span>AZN</span></div>
+        <ul class="plain">
+          <li>Gündəlik aktivliyin izlənməsi</li>
+          <li>Yuxu və istirahət dövrlərinin təxmini hesablanması</li>
+          <li>Gündəlik və həftəlik statistika</li>
+          <li>Telefona Bluetooth ilə qoşulur</li>
+          <li>Aylıq abunə yoxdur</li>
+        </ul>
+        <a class="btn ghost" href="#sifaris" data-v="Basic">Basic sifariş et</a>
+      </article>
+      <article class="card gps">
+        <span class="tag">Basic + yer izləmə</span>
+        <h3>PetSense GPS</h3>
+        <div class="price"><b data-n="249" data-d="0">249</b> <span>AZN</span></div>
+        <p class="muted" style="margin:.3rem 0 0">+ ayda 8.90 AZN (SIM və mobil internet)</p>
+        <ul class="plain">
+          <li>Basic versiyanın bütün imkanları</li>
+          <li>GPS ilə pişiyin yeri</li>
+          <li>Real vaxt rejimində yer yenilənməsi</li>
+          <li>Təhlükəsiz zona bildirişləri</li>
+          <li>Yer tarixçəsi</li>
+        </ul>
+        <a class="btn" href="#sifaris" data-v="GPS">GPS sifariş et</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="texnologiya">
+  <div class="wrap">
+    <h2>Necə işləyir</h2>
+    <dl class="screens">
+      <div><dt>Akselerometr</dt><dd>Hərəkəti və aktivliyi ölçür. Hər iki versiyada var.</dd></div>
+      <div><dt>Bluetooth</dt><dd>Məlumatı telefona ötürür. Hər iki versiyada var.</dd></div>
+      <div><dt>GPS modulu</dt><dd>Pişiyin yerini real vaxtda izləyir. Yalnız GPS versiyada.</dd></div>
+      <div><dt>SIM kart</dt><dd>Mobil internet bağlantısı verir ki, yer məlumatı telefonunuza çatsın. Yalnız GPS versiyada.</dd></div>
+      <div><dt>Mobil tətbiq</dt><dd>Aktivlik, istirahət və yer məlumatını bir yerdə göstərir.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="kimler">
+  <div class="wrap two">
+    <div>
+      <h2>Kimlər üçün</h2>
+      <ul class="plain">
+        <li><b>Pişik sahibləri.</b> Pişiyinin gündəlik rejimini bilmək istəyənlər.</li>
+        <li><b>Evdən uzaqda vaxt keçirənlər.</b> İş vaxtı pişiyinin vəziyyətini görmək istəyənlər.</li>
+        <li><b>Təhlükəsizlik barədə düşünən ailələr.</b> Xüsusilə pişiyi çölə çıxanlar.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Hansını seçim?</h2>
+      <p><b>Basic</b> pişik əsasən evdədirsə və siz yalnız aktivlik və yuxu dəyişikliyini izləmək istəyirsinizsə.</p>
+      <p><b>GPS</b> pişik çölə çıxırsa və harada olduğunu bilmək istəyirsinizsə.</p>
+    </div>
+  </div>
+</section>
+
+<section class="alt" id="qiymet">
+  <div class="wrap">
+    <h2>Qiymət</h2>
+    <p>Basic birdəfəlik alınır. GPS versiyada cihaz birdəfəlik, SIM və mobil internet isə aylıq ödənilir.</p>
+    <div class="tw">
+      <table>
+        <thead><tr><th></th><th>Basic</th><th>GPS</th></tr></thead>
+        <tbody>
+          <tr><td>Cihaz (birdəfəlik)</td><td class="y">149 AZN</td><td class="y">249 AZN</td></tr>
+          <tr><td>Aylıq abunə</td><td>Yoxdur</td><td class="y">8.90 AZN</td></tr>
+          <tr><td>Aktivlik və yuxu izləmə</td><td>Bəli</td><td>Bəli</td></tr>
+          <tr><td>Bluetooth</td><td>Bəli</td><td>Bəli</td></tr>
+          <tr><td>GPS və SIM kart</td><td>Yoxdur</td><td>Bəli</td></tr>
+          <tr><td>Təhlükəsiz zona və yer tarixçəsi</td><td>Yoxdur</td><td>Bəli</td></tr>
+          <tr><td>İlk il cəmi</td><td class="y">149 AZN</td><td class="y">355.80 AZN</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="sual">
+  <div class="wrap">
+    <h2>Tez-tez verilən suallar</h2>
+    <details><summary>Basic ilə GPS arasında fərq nədir?</summary><p>Basic aktivlik və istirahəti izləyir. GPS versiya bunlara əlavə olaraq pişiyin yerini, təhlükəsiz zona bildirişlərini və yer tarixçəsini göstərir.</p></details>
+    <details><summary>Abunə lazımdır?</summary><p>Basic üçün yox. GPS versiyada SIM kart və mobil internet üçün ayda 8.90 AZN ödənilir.</p></details>
+    <details><summary>Basic telefonla necə işləyir?</summary><p>Bluetooth ilə. Məlumat telefona qoşulanda ötürülür, ona görə telefonun yaxınlıqda olması lazımdır.</p></details>
+    <details><summary>GPS hər yerdə işləyirmi?</summary><p>Açıq havada ən yaxşı işləyir. Bina daxilində və zəif mobil şəbəkə olan yerdə yer məlumatı gecikə və ya dəqiqliyi azala bilər.</p></details>
+    <details><summary>PetSense xəstəliyi aşkar edir?</summary><p>Xeyr. PetSense aktivlik və istirahət dəyişikliklərini göstərir. Diaqnoz qoymur və baytar müayinəsini əvəz etmir.</p></details>
+    <details><summary>Məlumatlarım necə qorunur?</summary><p>Minimum məlumat toplanır, təhlükəsiz saxlanılır və yalnız sizin razılığınızla istifadə olunur.</p></details>
+  </div>
+</section>
+
+<section class="alt" id="sifaris">
+  <div class="wrap two">
+    <div>
+      <h2>Sifariş et</h2>
+      <p>Versiyanı seçin, məlumatlarınızı yazın. Sifarişi təsdiqləmək üçün sizinlə əlaqə saxlayaq.</p>
+    </div>
+    <form id="f">
+      <label>Versiya
+        <select name="ver" id="ver"><option value="Basic">PetSense Basic · 149 AZN</option><option value="GPS">PetSense GPS · 249 AZN + ayda 8.90 AZN</option></select>
+      </label>
+      <label>Adınız<input name="ad" required autocomplete="name"></label>
+      <label>Telefon<input name="tel" type="tel" required autocomplete="tel"></label>
+      <label>E-poçt<input name="email" type="email" autocomplete="email"></label>
+      <button class="btn" type="submit">Sifariş göndər</button>
+      <p class="ok" id="ok" role="status">Təşəkkürlər! E-poçt proqramınızda sifariş mesajı açıldı, göndərin.</p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p style="display:flex;align-items:center;gap:.6rem"><img class="mark" src="data:image/png;base64,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" alt="" width="36" height="36"><span><b>PetSense</b>. Pişiklər üçün aktivlik və GPS izləmə.</span></p>
+    <p>PetSense tibbi cihaz deyil və diaqnoz qoymur.</p>
+    <p><a class="toplink" href="#">↑ Yuxarı qayıt</a></p>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('[data-v]').forEach(function(a){a.addEventListener('click',function(){document.getElementById('ver').value=a.dataset.v;var f=document.getElementById('f');f.classList.remove('flash');void f.offsetWidth;f.classList.add('flash')})});
+document.getElementById('f').addEventListener('submit',function(e){
+  e.preventDefault();
+  var d=new FormData(e.target);
+  var en=document.documentElement.lang==='en';var body=en?('Version: PetSense '+d.get('ver')+'\nName: '+d.get('ad')+'\nPhone: '+d.get('tel')+'\nEmail: '+d.get('email')):('Versiya: PetSense '+d.get('ver')+'\nAd: '+d.get('ad')+'\nTelefon: '+d.get('tel')+'\nE-poçt: '+d.get('email'));
+  var ok=document.getElementById('ok');ok.style.display='block';ok.classList.add('show');
+  location.href='mailto:info@petsense.az?subject='+encodeURIComponent(en?'PetSense order':'PetSense sifarişi')+'&body='+encodeURIComponent(body);
+});
+</script>
+<script>
+(function(){
+var d=document,rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+d.documentElement.classList.add('js');
+var h=d.querySelector('h1'),t=h.textContent;
+function buildH1(x){h.setAttribute('aria-label',x);h.textContent='';x.split(' ').forEach(function(w,i){var s=d.createElement('span');s.className='w';s.setAttribute('aria-hidden','true');s.style.animationDelay=(i*90)+'ms';s.textContent=w;h.appendChild(s);h.appendChild(d.createTextNode(' '))})}
+buildH1(t);
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+d.querySelectorAll('section .wrap > *, .cards > article, dl.screens > div, details, ul.plain li, ol.flow li').forEach(function(el){
+  var i=Array.prototype.indexOf.call(el.parentNode.children,el);
+  el.style.setProperty('--d',Math.min(i*0.09,0.45)+'s');el.classList.add('rv');io.observe(el)});
+function count(el){var n=+el.dataset.n,dc=+el.dataset.d||0,st=null;if(rm)return;
+  (function f(ts){st=st||ts;var p=Math.min((ts-st)/1100,1),v=n*(1-Math.pow(1-p,3));el.textContent=v.toFixed(dc);if(p<1)requestAnimationFrame(f)})(performance.now());}
+var co=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){count(e.target);co.unobserve(e.target)}})},{threshold:.6});
+d.querySelectorAll('[data-n]').forEach(function(el){co.observe(el)});
+var links={};d.querySelectorAll('nav a[href^="#"]:not(.btn)').forEach(function(a){links[a.getAttribute('href').slice(1)]=a});
+var so=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){Object.keys(links).forEach(function(k){links[k].classList.remove('act')});var a=links[e.target.id];if(a)a.classList.add('act')}})},{rootMargin:'-45% 0px -50% 0px'});
+d.querySelectorAll('section[id]').forEach(function(x){so.observe(x)});
+var pg=d.getElementById('pg'),hd=d.querySelector('header.top'),tk=false;
+function sc(){var m=d.documentElement.scrollHeight-innerHeight;pg.style.transform='scaleX('+(m>0?scrollY/m:0)+')';hd.classList.toggle('sc',scrollY>8);tk=false}
+addEventListener('scroll',function(){if(!tk){tk=true;requestAnimationFrame(sc)}},{passive:true});sc();
+if(matchMedia('(hover:hover)').matches&&!rm)d.querySelectorAll('.card').forEach(function(c){
+  c.addEventListener('pointermove',function(e){var r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;c.style.transform='perspective(900px) rotateY('+(x*6)+'deg) rotateX('+(-y*6)+'deg) translateY(-4px)'});
+  c.addEventListener('pointerleave',function(){c.style.transform=''})});
+var tt=d.getElementById('tt');
+function cur(){return d.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light')}
+tt.addEventListener('click',function(){var n=cur()==='dark'?'light':'dark';d.documentElement.setAttribute('data-theme',n);try{localStorage.setItem('ps-theme',n)}catch(e){}});
+
+var EN=["Skip to main content", "PetSense", "Products", "Technology", "Price", "Questions", "Order now", "PetSense is a smart collar module for cats. It tracks daily activity and rest. If you choose, GPS also shows where your cat is.", "Compare the two versions", "Order now", "Your cat’s last 7 days", "Sample data, not real", "This cat’s normal range", "Monday: within normal range", "Tuesday: within normal range", "Wednesday: within normal range", "Thursday: within normal range", "Friday: within normal range", "Saturday: within normal range", "Sunday: below normal", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", "Less movement than usual today.", "You see changes in sleep and activity in the app.", "PetSense on your cat", "The small module on the collar measures your cat’s movement, sends the data to your phone and alerts you when something changes.", "1. The module measures your cat’s movement", "2. Data reaches your phone; with GPS, location shows on the map", "3. You get a notification when something changes", "Concept animation, not footage of the real product.", "Problems cat owners face", "Lack of information", "You don’t know how active your cat is during the day.", "Location problems", "When your cat goes outside, it’s hard to know where it is.", "Behavior changes", "Changes in sleep and activity habits can go unnoticed.", "Safety concerns", "You want to feel confident about your cat’s safety.", "Two versions, one app", "Choose the one that fits your needs.", "No subscription", "PetSense Basic", "AZN", "Daily activity tracking", "Estimated sleep and rest periods", "Daily and weekly statistics", "Connects to your phone via Bluetooth", "No monthly subscription", "Order Basic", "Basic + location tracking", "PetSense GPS", "AZN", "+ 8.90 AZN per month (SIM and mobile data)", "All Basic features", "Your cat’s location via GPS", "Real-time location updates", "Safe-zone notifications", "Location history", "Order GPS", "How it works", "Accelerometer", "Measures movement and activity. In both versions.", "Bluetooth", "Sends data to your phone. In both versions.", "GPS module", "Tracks your cat’s location in real time. GPS version only.", "SIM card", "Provides a mobile internet connection so location data reaches your phone. GPS version only.", "Mobile app", "Shows activity, rest and location in one place.", "Who it’s for", "Cat owners.", "People who want to know their cat’s daily routine.", "People away from home.", "Those who want to check on their cat while at work.", "Safety-minded families.", "Especially those whose cats go outside.", "Which one should I choose?", "Basic", "if your cat mostly stays at home and you only want to track changes in activity and sleep.", "GPS", "if your cat goes outside and you want to know where it is.", "Price", "Basic is a one-time purchase. With GPS, the device is a one-time purchase, while the SIM and mobile data are paid monthly.", "Basic", "GPS", "Device (one-time)", "149 AZN", "249 AZN", "Monthly subscription", "None", "8.90 AZN", "Activity and sleep tracking", "Yes", "Yes", "Bluetooth", "Yes", "Yes", "GPS and SIM card", "None", "Yes", "Safe zone and location history", "None", "Yes", "First-year total", "149 AZN", "355.80 AZN", "Frequently asked questions", "What’s the difference between Basic and GPS?", "Basic tracks activity and rest. The GPS version also shows your cat’s location, safe-zone notifications and location history.", "Do I need a subscription?", "Not for Basic. The GPS version costs 8.90 AZN per month for the SIM card and mobile data.", "How does Basic work with my phone?", "Via Bluetooth. Data is transferred when the device connects to your phone, so your phone needs to be nearby.", "Does GPS work everywhere?", "It works best outdoors. Indoors or in areas with weak mobile coverage, location data may be delayed or less accurate.", "Does PetSense detect illness?", "No. PetSense shows changes in activity and rest. It does not diagnose and does not replace a veterinary exam.", "How is my data protected?", "Only minimal data is collected, stored securely and used only with your consent.", "Order now", "Choose a version and enter your details. We’ll contact you to confirm your order.", "Version", "PetSense Basic · 149 AZN", "PetSense GPS · 249 AZN + 8.90 AZN per month", "Your name", "Phone", "Email", "Place order", "Thank you! A message opened in your email app. Please send it.", "PetSense", ". Activity and GPS tracking for cats.", "PetSense is not a medical device and does not diagnose.", "↑ Back to top"];
+var H1=[t,'Know your cat’s day and where it is.'];
+var w=d.createTreeWalker(d.body,NodeFilter.SHOW_TEXT,{acceptNode:function(n){var p=n.parentNode;if(p.closest&&p.closest('script,style,h1,#lg'))return NodeFilter.FILTER_REJECT;return /\p{L}/u.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+var nodes=[],AZ=[],nn;while((nn=w.nextNode())){nodes.push(nn);AZ.push(nn.nodeValue)}
+var okL=nodes.length===EN.length;
+var ATT=[['.panel','aria-label','Sample activity chart'],['svg.chart','aria-label','Seven-day activity chart: six normal days, the last day below normal'],['#tt','aria-label','Switch light and dark mode'],['#tt','title','Light / dark mode'],['.vstage','aria-label','Concept animation showing the PetSense module on a cat’s collar at work'],['#vp','aria-label','Pause / play animation'],['meta[name=description]','content','PetSense: a smart collar module for cats. Basic tracks activity; GPS tracks both activity and location.'],['meta[property="og:title"]','content','PetSense: activity and GPS tracking for cats'],['meta[property="og:description"]','content','Two versions, one app: PetSense Basic 149 AZN, PetSense GPS 249 AZN.']];
+ATT.forEach(function(a){a.el=d.querySelector(a[0]);a.az=a.el?a.el.getAttribute(a[1]):null});
+var TAZ=d.title,TEN='PetSense: activity and GPS tracking for cats',lgs=d.querySelectorAll('#lg span');
+function pad(s,x){var m=s.match(/^(\s*)[\s\S]*?(\s*)$/);return m[1]+x+m[2]}
+function setLang(l){if(!okL)return;var en=l==='en';
+  nodes.forEach(function(n,i){n.nodeValue=en?pad(AZ[i],EN[i]):AZ[i]});
+  buildH1(en?H1[1]:H1[0]);
+  ATT.forEach(function(a){if(a.el)a.el.setAttribute(a[1],en?a[2]:a.az)});
+  d.title=en?TEN:TAZ;d.documentElement.lang=en?'en':'az';
+  lgs[0].classList.toggle('on',!en);lgs[1].classList.toggle('on',en);
+  try{localStorage.setItem('ps-lang',l)}catch(e){}}
+var vp=d.getElementById('vp');if(vp)vp.addEventListener('click',function(){var p=d.getElementById('vw').classList.toggle('paused');vp.textContent=p?'▶':'⏸';vp.setAttribute('aria-pressed',p)});
+d.getElementById('lg').addEventListener('click',function(){setLang(d.documentElement.lang==='en'?'az':'en')});
+try{if(localStorage.getItem('ps-lang')==='en')setLang('en')}catch(e){}
+})();
+</script>
+</body>
+</html>
